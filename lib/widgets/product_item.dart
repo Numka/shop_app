@@ -43,8 +43,19 @@ class ProductItem extends StatelessWidget {
               icon: Icon(
                 product.isFavorite ? Icons.favorite : Icons.favorite_border,
               ),
-              onPressed: () {
-                product.toggleFavoriteStatus();
+              onPressed: () async {
+                try {
+                  await product.toggleFavoriteStatus(product.id);
+                } catch (error) {
+                  Scaffold.of(ctx).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        'Favoriting failed',
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  );
+                }
               },
               color: Theme.of(context).accentColor,
             ),
