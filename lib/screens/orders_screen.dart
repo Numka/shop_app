@@ -13,36 +13,49 @@ class OrdersScreen extends StatefulWidget {
 }
 
 class _OrdersScreenState extends State<OrdersScreen> {
-  var _isLoading = false;
+  Future _ordersFuture;
+
+  // when something else rebuilds this windet, in this case only for reference
+  Future _obtainOrdersFuture() {
+    return Provider.of<Orders>(context, listen: false).fetchAndSetOrders();
+  }
 
   @override
   void initState() {
     super.initState();
-    _isLoading = true;
-    Provider.of<Orders>(context, listen: false).fetchAndSetOrders();
-    setState(() {
-      _isLoading = false;
-    });
+    _ordersFuture = _obtainOrdersFuture();
   }
 
   @override
   Widget build(BuildContext context) {
-    final ordersData = Provider.of<Orders>(context);
+    //final ordersData = Provider.of<Orders>(context);
+    print('building orders');
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Your Order'),
-      ),
-      drawer: AppDrawer(),
-      body: _isLoading
-          ? Center(
-              child: CircularProgressIndicator(),
-            )
-          : ListView.builder(
-              itemCount: ordersData.orders.length,
-              itemBuilder: (ctx, i) => OrderItemCard(
-                ordersData.orders[i],
-              ),
-            ),
-    );
+        appBar: AppBar(
+          title: Text('Your Order'),
+        ),
+        drawer: AppDrawer(),
+        body: FutureBuilder(
+          future: _ordersFuture,
+          builder: (ctx, dataSnapshot) {
+            if (dataSnapshot.connectionState == ConnectionState.waiting) {
+              return Center(
+                child: CircularProgressIndicator(),
+              );
+            } else if (dataSnapshot.error != null) {
+              // error handling
+              return Center(
+                child: Text('An error ocurred!'),
+              );
+            } else {
+              return Consumer<Orders>(
+                builder: (ctx, orderData, child) => ListView.builder(
+                  itemCount: orderData.orders.length,
+                  itemBuilder: (ctx, i) => OrderItemCard(orderData.orders[i]),
+                ),
+              );
+            }
+          },
+        ));
   }
 }
