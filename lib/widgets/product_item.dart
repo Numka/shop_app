@@ -48,7 +48,9 @@ class ProductItem extends StatelessWidget {
               onPressed: () async {
                 try {
                   await product.toggleFavoriteStatus(
-                      product.id, authData.token);
+                    authData.token,
+                    authData.userId,
+                  );
                 } catch (error) {
                   Scaffold.of(ctx).showSnackBar(
                     SnackBar(
