@@ -21,8 +21,9 @@ class Product with ChangeNotifier {
     this.isFavorite = false,
   });
 
-  Future<void> toggleFavoriteStatus(String prodId) async {
-    final url = 'https://flutter-shop-5e8cd.firebaseio.com/products/$id.json';
+  Future<void> toggleFavoriteStatus(String prodId, String token) async {
+    final url =
+        'https://flutter-shop-5e8cd.firebaseio.com/products/$id.json?auth=$token';
     final oldStatus = isFavorite;
     isFavorite = !isFavorite;
     notifyListeners();
