@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter_config/flutter_config.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/http_exception.dart';
@@ -11,6 +12,8 @@ class Auth with ChangeNotifier {
   DateTime _expiryDate;
   String _userId;
   Timer _authTimer;
+
+  var apiUrl = FlutterConfig.get('FIREBASE_API_KEY');
 
   bool get isAuth {
     return token != null;
@@ -35,7 +38,7 @@ class Auth with ChangeNotifier {
     String urlSegment,
   ) async {
     final url =
-        'https://identitytoolkit.googleapis.com/v1/accounts:$urlSegment?key=AIzaSyBxGu5oWy4jb6ZkWedQPRZKbVwH_14ceIY';
+        'https://identitytoolkit.googleapis.com/v1/accounts:$urlSegment?key=$apiUrl';
     try {
       final response = await http.post(
         url,
@@ -73,14 +76,10 @@ class Auth with ChangeNotifier {
   }
 
   Future<void> signup(String email, String password) async {
-    // const url =
-    //     'https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=AIzaSyBxGu5oWy4jb6ZkWedQPRZKbVwH_14ceIY';
     return _authenticate(email, password, 'signUp');
   }
 
   Future<void> signin(String email, String password) async {
-    // const url =
-    //     'https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyBxGu5oWy4jb6ZkWedQPRZKbVwH_14ceIY';
     return _authenticate(email, password, 'signInWithPassword');
   }
 
@@ -113,7 +112,6 @@ class Auth with ChangeNotifier {
     }
     notifyListeners();
     final prefs = await SharedPreferences.getInstance();
-    //prefs.remove('userData');
     prefs.clear();
   }
 
